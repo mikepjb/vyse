@@ -1,19 +1,37 @@
 package main
 
-import "fmt"
+import (
+  "fmt"
+  "strings"
+  "bufio"
+  "io"
+  "os"
+)
 
-func prompt() {
-  var result string;
+func tokenize(code string) string {
+  return strings.Replace(
+    strings.Replace(code, "(", " ( ", -1), ")", " ) ", -1)
+}
 
-  fmt.Printf("Vyse v0\n")
+func prompt(in io.Reader, out io.Writer) error {
+  fmt.Fprintf(out, "Vyse v0\n")
+  fmt.Fprintf(out, ">>> ")
 
-  for true {
-    fmt.Printf(">>> ")
-    fmt.Scanln(&result)
-    fmt.Printf(result + "\n")
+  scanner := bufio.NewScanner(in)
+  for scanner.Scan() {
+    result := scanner.Text()
+    token := tokenize(result)
+
+    fmt.Println(token)
+    fmt.Fprintf(out, ">>> ")
   }
+
+  return scanner.Err()
 }
 
 func main() {
-  prompt()
+  err := prompt(os.Stdin, os.Stdout)
+  if err != nil {
+    panic(err)
+  }
 }
